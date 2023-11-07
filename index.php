@@ -104,11 +104,22 @@ if (isset($_GET['act']) && ($_GET['act'] != "")) {
                     date_default_timezone_set('Asia/Ho_Chi_Minh');
                     $ngaydathang = date('H:i:s d/m/Y');
                     $tongcong = tongcong();
+                    
+                    /*
+                    You need to ensure that a valid user id is always passed to the insert_giohang function. 
+                    If a user is not logged in (i.e., $_SESSION['user']['id'] is not set), 
+                    you should not allow them to add items to the cart. 
+                    */ 
+                    if (!isset($_SESSION['user']) || !isset($_SESSION['user']['id'])) {
+                        // Redirect to login page or show an error message
+                        header('Location: dangky.php');
+                        exit();
+                    }
 
                     $idbill = insert_bill($iduser, $hovaten, $diachi, $email, $phone, $pttt, $ngaydathang, $tongcong);
 
                     foreach ($_SESSION['donhang'] as $giohang) {
-                        insert_giohang($_SESSION['user']['id'], $giohang[0], $giohang[2], $giohang[1], $giohang[3], $giohang[4], $giohang[5], $idbill);
+                        insert_giohang($iduser, $giohang[0], $giohang[2], $giohang[1], $giohang[3], $giohang[4], $giohang[5], $idbill);
                     }
 
                     $_SESSION['donhang'] = [];
